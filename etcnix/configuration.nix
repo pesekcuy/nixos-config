@@ -14,7 +14,8 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # networking.hostName = "nixos"; # Define your hostname.
+  boot.initrd.luks.devices."luks-2860de7e-d394-4102-bda5-85caf600591a".device =  "/dev/disk/by-uuid/2860de7e-d394-4102-bda5-85caf600591a";
+  networking.hostName = "x1c6"; # Define your hostname.
   # Pick only one of the below networking options.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
@@ -28,6 +29,17 @@
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "id_ID.UTF-8";
+    LC_IDENTIFICATION = "id_ID.UTF-8";
+    LC_MEASUREMENT = "id_ID.UTF-8";
+    LC_MONETARY = "id_ID.UTF-8";
+    LC_NAME = "id_ID.UTF-8";
+    LC_NUMERIC = "id_ID.UTF-8";
+    LC_PAPER = "id_ID.UTF-8";
+    LC_TELEPHONE = "id_ID.UTF-8";
+    LC_TIME = "id_ID.UTF-8";
+  };
   # console = {
   #   font = "Lat2-Terminus16";
   #   keyMap = "us";
@@ -35,10 +47,16 @@
   # };
 
   # Enable the X11 windowing system.
-  services.xserver.enable = true;
-  services.xserver.displayManager.sddm.enable = true;
-  services.xserver.desktopManager.plasma5.enable = true;
-  services.xserver.displayManager.defaultSession = "plasmawayland";
+  services.xserver = {
+    enable = true;
+    layout = "us";
+    xkbVariant = "";
+    desktopManager.plasma5.enable = true;
+    displayManager = {
+      sddm.enable = true;
+      defaultSession = "plasmawayland";
+    };
+  };
 
   environment.plasma5.excludePackages = with pkgs; [
     elisa
@@ -51,7 +69,7 @@
   
 
   # Configure keymap in X11
-  services.xserver.layout = "us";
+  # services.xserver.layout = "us";
   # services.xserver.xkbOptions = "eurosign:e,caps:escape";
 
   # Enable CUPS to print documents.
@@ -93,6 +111,9 @@
     usbutils
     pciutils
   ];
+
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
 
   fonts.packages = with pkgs; [
     cantarell-fonts
