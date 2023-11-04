@@ -116,17 +116,17 @@
   nixpkgs.config.allowUnfree = true;
 
   fonts.packages = with pkgs; [
-    cantarell-fonts
+    roboto
     noto-fonts
     noto-fonts-cjk
     noto-fonts-emoji
     liberation_ttf
-    (nerdfonts.override { fonts = [ "SourceCodePro" ]; })
+    (nerdfonts.override { fonts = [ "Mononoki" ]; })
   ];
   fonts.fontconfig.defaultFonts = {
     serif = [ "Noto Serif" ];
-    sansSerif = [ "Cantarell" ];
-    monospace = [ "SauceCodePro Nerd Font" ];
+    sansSerif = [ "Roboto" ];
+    monospace = [ "Mononoki Nerd Font" ];
   };
 
   # Some programs need SUID wrappers, can be configured further or are

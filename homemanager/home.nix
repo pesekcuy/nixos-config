@@ -25,6 +25,7 @@
     # pkgs.hello
     git
     libsForQt5.kate
+    libsForQt5.kcalc
     mpv
     libreoffice-fresh
     kicad
