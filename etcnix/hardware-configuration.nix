@@ -12,7 +12,7 @@
   boot.initrd.kernelModules = [ ];
   boot.kernelPackages = pkgs.linuxPackages_zen;
   boot.kernelModules = [ "kvm-intel" "msr" ];
-  boot.kernelParams = [ "i915.enable_psr=0" "i915.enable_fbc=0" ];
+  boot.kernelParams = [ "i915.enable_psr=0" "i915.enable_fbc=0" "quiet" ];
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
