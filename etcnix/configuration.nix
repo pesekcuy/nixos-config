@@ -110,23 +110,23 @@
     wget
     usbutils
     pciutils
+    glib
   ];
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
   fonts.packages = with pkgs; [
-    roboto
     noto-fonts
     noto-fonts-cjk
     noto-fonts-emoji
     liberation_ttf
-    (nerdfonts.override { fonts = [ "Mononoki" ]; })
   ];
+
   fonts.fontconfig.defaultFonts = {
     serif = [ "Noto Serif" ];
-    sansSerif = [ "Roboto" ];
-    monospace = [ "Mononoki Nerd Font" ];
+    sansSerif = [ "Noto Sans" ];
+    monospace = [ "Hack" ];
   };
 
   # Some programs need SUID wrappers, can be configured further or are
