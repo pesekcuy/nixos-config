@@ -53,7 +53,9 @@
     xkbVariant = "";
     desktopManager.plasma5.enable = true;
     displayManager = {
-      sddm.enable = true;
+      lightdm.enable = true;
+      autoLogin.enable = true;
+      autoLogin.user = "pesekcuy";
       defaultSession = "plasmawayland";
     };
   };
@@ -66,7 +68,7 @@
   ];
 
   programs.dconf.enable = true;
-  
+  programs.partition-manager.enable = true;  
 
   # Configure keymap in X11
   # services.xserver.layout = "us";
@@ -117,16 +119,18 @@
   nixpkgs.config.allowUnfree = true;
 
   fonts.packages = with pkgs; [
+    roboto
     noto-fonts
     noto-fonts-cjk
     noto-fonts-emoji
     liberation_ttf
+    (nerdfonts.override { fonts = [ "CodeNewRoman" ]; })
   ];
 
   fonts.fontconfig.defaultFonts = {
     serif = [ "Noto Serif" ];
-    sansSerif = [ "Noto Sans" ];
-    monospace = [ "Hack" ];
+    sansSerif = [ "Roboto" ];
+    monospace = [ "CodeNewRoman Nerd Font" ];
   };
 
   # Some programs need SUID wrappers, can be configured further or are
