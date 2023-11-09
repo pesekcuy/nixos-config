@@ -2,8 +2,14 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running `nixos-help`).
 
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
+let
+  my-python-packages = ps: with ps; [
+    scipy
+    matplotlib
+  ];
+in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -98,7 +104,7 @@
   users.users.pesekcuy = {
     description = "Adi Nugroho";
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "audio" "video" "input" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" "networkmanager" "audio" "video" "input" "libvirtd" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [
       firefox
       tree
@@ -113,6 +119,7 @@
     usbutils
     pciutils
     glib
+    (python3.withPackages my-python-packages)
   ];
 
   # Allow unfree packages
@@ -256,6 +263,9 @@
 	ANALOGIO: -100
       '';
   };
+
+  virtualisation.libvirtd.enable = true;
+  programs.virt-manager.enable = true;
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
