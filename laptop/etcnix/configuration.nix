@@ -13,6 +13,7 @@ in
 {
   imports =
     [ # Include the results of the hardware scan.
+      <nixos-hardware/lenovo/thinkpad/x1/6th-gen>
       ./hardware-configuration.nix
     ];
 
