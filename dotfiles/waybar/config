@@ -1,0 +1,96 @@
+{
+    "layer": "top", // Waybar at top layer
+    "position": "top", // Waybar position (top|bottom|left|right)
+    "height": 20, // Waybar height (to be removed for auto height)
+    // "width": 35, // Waybar width
+    // "spacing": 4, // Gaps between modules (4px)
+    // Choose the order of the modules
+    "modules-left": ["hyprland/workspaces"],
+    "modules-center": [],
+    "modules-right": ["idle_inhibitor", "network", "pulseaudio#source", "pulseaudio#sink", "battery", "tray", "clock", "custom/power"],
+
+    "hyprland/workspaces": {
+      "all-outputs": true,
+	// "format": "{icon}",
+        // "format-icons": {
+	//  "urgent": "",
+	//  "focused": "",
+	//  "default": ""
+	//},
+	"persistent_workspaces": {
+	   "1": [],
+	   "2": [],
+	   "3": [],
+	   "4": [],
+	   "5": [],
+	//    "6": [],
+	//    "7": [],
+	//    "8": [],
+	//    "9": [],
+	//    "10": [],
+	}
+    },
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "<span font_desc='Font Awesome 6 Free'></span>",
+            "deactivated": "<span font_desc='Font Awesome 6 Free'></span>"
+        }
+    },
+    "tray": {
+        // "icon-size": 21,
+        "spacing": 10
+    },
+    "clock": {
+	// "interval": 1,
+        // "timezone": "America/New_York",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "format": "{:%a, %d %b  %H:%M}",
+    },
+    "battery": {
+        "states": {
+            // "good": 95,
+            "warning": 30,
+            "critical": 15,
+        },
+        "format": "{icon} {capacity}%",
+        "format-charging": "<span font_desc='Font Awesome 6 Free'></span> {capacity}%",
+        "format-plugged": "<span font_desc='Font Awesome 6 Free'></span> {capacity}%",
+        "tooltip-format": "{time}",
+        "format-icons": ["<span font_desc='Font Awesome 6 Free'></span>", "<span font_desc='Font Awesome 6 Free'></span>", "<span font_desc='Font Awesome 6 Free'></span>", "<span font_desc='Font Awesome 6 Free'></span>", "<span font_desc='Font Awesome 6 Free'></span>"]
+    },
+    "network": {
+        "format-wifi": "<span font_desc='Font Awesome 6 Free'></span>",
+        "format-ethernet": "<span font_desc='Font Awesome 6 Free'></span>",
+        "format-linked": "<span font_desc='Font Awesome 6 Free'></span>",
+        "format-disconnected": "<span font_desc='Font Awesome 6 Free'>⚠</span>",
+	"tooltip-format": "{essid}\r{ipaddr}",
+    },
+    "pulseaudio#sink": {
+        // "scroll-step": 1, // %, can be a float
+        "format": "{icon} {volume}%",
+        "format-bluetooth": "{icon}\n<span font_desc='Font Awesome 6 Free'></span>",
+        "format-bluetooth-muted": "<span font_desc='Font Awesome 6 Free'>\n</span>",
+        "format-muted": "<span font_desc='Font Awesome 6 Free'></span>",
+        "format-icons": {
+            "headphone": "<span font_desc='Font Awesome 6 Free'></span>",
+            "hands-free": "<span font_desc='Font Awesome 6 Free'></span>",
+            "headset": "<span font_desc='Font Awesome 6 Free'></span>",
+            "phone": "<span font_desc='Font Awesome 6 Free'></span>",
+            "portable": "<span font_desc='Font Awesome 6 Free'></span>",
+            "car": "<span font_desc='Font Awesome 6 Free'></span>",
+            "default": ["<span font_desc='Font Awesome 6 Free'></span>", "<span font_desc='Font Awesome 6 Free'></span>", "<span font_desc='Font Awesome 6 Free'></span>"]
+        },
+    },
+    "pulseaudio#source": {
+        "format-source": "<span font_desc='Font Awesome 6 Free'></span>",
+        "format-source-muted": "<span font_desc='Font Awesome 6 Free'></span>",
+        "format": "{format_source}",
+	"tooltip": false,
+    },
+    "custom/power": {
+	"format": "",
+	"on-click": "exec ~/.config/waybar/scripts/power-menu.sh",
+	"tooltip": false,
+    },
+}
