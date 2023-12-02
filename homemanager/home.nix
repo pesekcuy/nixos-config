@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   # Home Manager needs a bit of information about you and the paths it should
@@ -13,9 +13,7 @@
   # You should not change this value, even if you update Home Manager. If you do
   # want to update the value, then make sure to first check the Home Manager
   # release notes.
-  home.stateVersion = "23.05"; # Please read the comment before changing.
-
-  nixpkgs.config.allowUnfree = true;
+  home.stateVersion = "23.11"; # Please read the comment before changing.
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
@@ -23,15 +21,30 @@
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
-    git
-    libsForQt5.kate
-    libsForQt5.kcalc
-    mpv
-    libreoffice-fresh
-    kicad
-    plasma5Packages.plasma-thunderbolt
-    qbittorrent
+
+    foot
+    wofi
+    hyprpaper
+    swayidle
+    swaylock
+    dunst
+    waybar
+    xdg-user-dirs
+    wl-mirror
+    pulseaudio
+    brightnessctl
+    pavucontrol
+    grim
+    slurp
+    imv
+
+    firefox
     gimp
+    git
+    kicad
+    libreoffice-fresh
+    mpv
+    qbittorrent
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
@@ -46,7 +59,13 @@
     #   echo "Hello, ${config.home.username}!"
     # '')
   ];
-  
+
+  programs.vscode = {
+    enable = true;
+    package = pkgs.vscodium;
+    extensions = with pkgs.vscode-extensions; [ ms-python.python ];
+  };
+
   programs.ncmpcpp = {
     enable = true;
     package = pkgs.ncmpcpp.override { visualizerSupport = true; clockSupport = true; };
@@ -78,8 +97,10 @@
     # '';
   };
 
-  # You can also manage environment variables but you will have to manually
-  # source
+  # Home Manager can also manage your environment variables through
+  # 'home.sessionVariables'. If you don't want to manage your shell through Home
+  # Manager then you have to manually source 'hm-session-vars.sh' located at
+  # either
   #
   #  ~/.nix-profile/etc/profile.d/hm-session-vars.sh
   #
@@ -87,10 +108,36 @@
   #
   #  /etc/profiles/per-user/pesekcuy/etc/profile.d/hm-session-vars.sh
   #
-  # if you don't want to manage your shell through Home Manager.
   home.sessionVariables = {
     # EDITOR = "emacs";
+    GTK_USE_PORTAL = "1";
   };
+
+  home.pointerCursor = {
+    x11.enable = true;
+    name = "Adwaita";
+    package = pkgs.gnome.adwaita-icon-theme;
+    size = 24;
+  };
+
+  gtk = {
+    enable = true;
+    font = {
+      package = pkgs.lato;
+      name = "Lato";
+      size = 12;
+    };
+    iconTheme = {
+      package = pkgs.papirus-icon-theme;
+      name = "Papirus-Dark";
+    };
+    theme = {
+      package = pkgs.gnome-themes-extra;
+      name = "Adwaita-dark";
+    };
+  };
+
+  nixpkgs.config.allowUnfree = true;
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;

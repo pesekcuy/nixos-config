@@ -1,8 +1,8 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running `nixos-help`).
+# and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   my-python-packages = ps: with ps; [
@@ -13,29 +13,31 @@ in
 {
   imports =
     [ # Include the results of the hardware scan.
-      <nixos-hardware/lenovo/thinkpad/x1/6th-gen>
       ./hardware-configuration.nix
+      <nixos-hardware/lenovo/thinkpad/x1/6th-gen>
     ];
 
-  # Use the systemd-boot EFI boot loader.
+  # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  boot.initrd.luks.devices."luks-2860de7e-d394-4102-bda5-85caf600591a".device =  "/dev/disk/by-uuid/2860de7e-d394-4102-bda5-85caf600591a";
-  networking.hostName = "x1c6"; # Define your hostname.
-  # Pick only one of the below networking options.
+  boot.initrd.luks.devices."luks-9e77a57b-87a7-4006-b7db-0f3e4a002f50".device = "/dev/disk/by-uuid/9e77a57b-87a7-4006-b7db-0f3e4a002f50";
+  networking.hostName = "nixos-x1c6"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-  networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
-
-  # Set your time zone.
-  time.timeZone = "Asia/Jakarta";
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
+  # Enable networking
+  networking.networkmanager.enable = true;
+
+  # Set your time zone.
+  time.timeZone = "Asia/Jakarta";
+
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
+
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "id_ID.UTF-8";
     LC_IDENTIFICATION = "id_ID.UTF-8";
@@ -47,100 +49,71 @@ in
     LC_TELEPHONE = "id_ID.UTF-8";
     LC_TIME = "id_ID.UTF-8";
   };
-  # console = {
-  #   font = "Lat2-Terminus16";
-  #   keyMap = "us";
-  #   useXkbConfig = true; # use xkbOptions in tty.
-  # };
-
-  # Enable the X11 windowing system.
-  services.xserver = {
-    enable = true;
-    layout = "us";
-    xkbVariant = "";
-    desktopManager.plasma5.enable = true;
-    displayManager = {
-      lightdm.enable = true;
-      autoLogin.enable = true;
-      autoLogin.user = "pesekcuy";
-      defaultSession = "plasmawayland";
-    };
-  };
-
-  environment.plasma5.excludePackages = with pkgs; [
-    elisa
-    oxygen
-    khelpcenter
-    plasma-browser-integration
-  ];
-
-  programs.dconf.enable = true;
-  programs.adb.enable = true;
-  programs.partition-manager.enable = true;  
 
   # Configure keymap in X11
-  # services.xserver.layout = "us";
-  # services.xserver.xkbOptions = "eurosign:e,caps:escape";
-
-  # Enable CUPS to print documents.
-  # services.printing.enable = true;
-
-  # Enable sound.
-  # sound.enable = true;
-  # hardware.pulseaudio.enable = true;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa = {
-      enable = true;
-      support32Bit = true;
-    };
-    pulse.enable = true;
+  services.xserver = {
+    layout = "us";
+    xkbVariant = "";
   };
-
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.pesekcuy = {
-    description = "Adi Nugroho";
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "audio" "video" "input" "libvirtd" "adbusers" ]; # Enable ‘sudo’ for the user.
-    packages = with pkgs; [
-      firefox
-      tree
-    ];
+    description = "Adi Nugroho";
+    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" ];
+    packages = with pkgs; [];
   };
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-  #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    wget
-    usbutils
-    pciutils
-    glib
-    (python3.withPackages my-python-packages)
-  ];
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  # List packages installed in system profile. To search, run:
+  # $ nix search wget
+  environment.systemPackages = with pkgs; [
+  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+  #  wget
+    polkit_gnome
+    (python3.withPackages my-python-packages)
+  ];
+
+  qt = {
+    enable = true;
+    platformTheme = "gtk2";
+    style = "adwaita-dark";
+  };
+
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  environment.variables.XCURSOR_SIZE = "32";
+
   fonts.packages = with pkgs; [
-    roboto
+    lato
     noto-fonts
     noto-fonts-cjk
     noto-fonts-emoji
     liberation_ttf
-    (nerdfonts.override { fonts = [ "CodeNewRoman" ]; })
+    font-awesome
+    (nerdfonts.override { fonts = [ "SpaceMono" ]; })
   ];
 
-  fonts.fontconfig.defaultFonts = {
-    serif = [ "Noto Serif" ];
-    sansSerif = [ "Roboto" ];
-    monospace = [ "CodeNewRoman Nerd Font Mono" ];
+  fonts.fontconfig = {
+    defaultFonts = {
+      serif = [ "Noto Serif" ];
+      sansSerif = [ "Lato" ];
+      monospace = [ "SpaceMono Nerd Font" ];
+    };
+    antialias = true;
+    hinting.enable = true;
+    hinting.style = "slight";
+    subpixel.rgba = "rgb";
   };
+
+  hardware.opengl = {
+    enable = true;
+    driSupport = true;
+    driSupport32Bit = true;
+    extraPackages = with pkgs; [ intel-media-driver ];
+  };
+  powerManagement.powertop.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -150,77 +123,86 @@ in
   #   enableSSHSupport = true;
   # };
 
-  hardware.opengl = {
+  programs.dconf.enable = true;
+
+  programs.hyprland.enable = true;
+  xdg.portal = {
     enable = true;
-    extraPackages = with pkgs; [ intel-media-driver ];
+    # gtk portal needed to make gtk apps happy
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
-  powerManagement.powertop.enable = true;
-  systemd.services.mpd.environment = {
-    # https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/609
-    XDG_RUNTIME_DIR = "/run/user/1000"; # User-id 1000 must matwch above user. MPD will look inside this directory for the PipeWire socket.
-  };
+
+  security.pam.services.swaylock = {};
+  security.polkit.enable = true;
+
+  programs.thunar.enable = true;
+  programs.thunar.plugins = with pkgs.xfce; [
+    thunar-archive-plugin
+    thunar-media-tags-plugin
+    thunar-volman
+  ];
+
+  virtualisation.libvirtd.enable = true;
+  virtualisation.spiceUSBRedirection.enable = true;
+  programs.virt-manager.enable = true;
 
   # List services that you want to enable:
 
-  services.mpd = {
-    enable = true;
-    user = "pesekcuy";
-    musicDirectory = "/home/pesekcuy/Music";
-    extraConfig = ''
-      # must specify one or more outputs in order to play audio!
-      # (e.g. ALSA, PulseAudio, PipeWire), see next sections
-      audio_output {
-        type "pipewire"
-        name "My PipeWire Output"
-      }
-      audio_output {
-        type "fifo"
-        name "Visualizer feed"
-        path "/tmp/mpd.fifo"
-        format "44100:16:2"
-      }
-    '';
+  services.printing.enable = true;
+  services.printing.drivers = [ pkgs.hplipWithPlugin ];
+  hardware.sane.enable = true;
+  hardware.sane.extraBackends = [ pkgs.hplipWithPlugin ];
 
-    network.listenAddress = "any"; # if you want to allow non-localhost connections
-    startWhenNeeded = true; # systemd feature: only start MPD service upon connection to its socket
+  services.gvfs = {
+    enable = true;
+    package = lib.mkForce pkgs.gnome3.gvfs;
+  };
+
+  services.tumbler.enable = true;
+
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    pulse.enable = true;
   };
 
   services.hardware.bolt.enable = true;
   services.power-profiles-daemon.enable = false;
   services.tlp = {
-      enable = true;
-      settings = {
-        CPU_SCALING_GOVERNOR_ON_AC = "powersave";
-        CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+    enable = true;
+    settings = {
+      CPU_SCALING_GOVERNOR_ON_AC = "powersave";
+      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
 
-	CPU_DRIVER_OPMODE_ON_AC = "active";
-        CPU_DRIVER_OPMODE_ON_BAT = "active";
+      CPU_DRIVER_OPMODE_ON_AC = "active";
+      CPU_DRIVER_OPMODE_ON_BAT = "active";
 
-        CPU_ENERGY_PERF_POLICY_ON_BAT = "balance_power";
-        CPU_ENERGY_PERF_POLICY_ON_AC = "balance_power";
+      CPU_ENERGY_PERF_POLICY_ON_BAT = "balance_power";
+      CPU_ENERGY_PERF_POLICY_ON_AC = "balance_power";
 
-        CPU_MIN_PERF_ON_AC = 0;
-        CPU_MAX_PERF_ON_AC = 100;
-        CPU_MIN_PERF_ON_BAT = 0;
-        CPU_MAX_PERF_ON_BAT = 100;
+      CPU_MIN_PERF_ON_AC = 0;
+      CPU_MAX_PERF_ON_AC = 100;
+      CPU_MIN_PERF_ON_BAT = 0;
+      CPU_MAX_PERF_ON_BAT = 100;
 
-	CPU_BOOST_ON_AC = 1;
-        CPU_BOOST_ON_BAT = 1;
+      CPU_BOOST_ON_AC = 1;
+      CPU_BOOST_ON_BAT = 1;
 
-        CPU_HWP_DYN_BOOST_ON_AC = 1;
-	CPU_HWP_DYN_BOOST_ON_BAT = 1;
+      CPU_HWP_DYN_BOOST_ON_AC = 1;
+      CPU_HWP_DYN_BOOST_ON_BAT = 1;
 
-	PLATFORM_PROFILE_ON_AC = "balanced";
-	PLATFORM_PROFILE_ON_BAT = "balanced";
+      PLATFORM_PROFILE_ON_AC = "balanced";
+      PLATFORM_PROFILE_ON_BAT = "balanced";
 
-	MEM_SLEEP_ON_AC = "deep";
-	MEM_SLEEP_ON_BAT = "deep";
+      MEM_SLEEP_ON_AC = "deep";
+      MEM_SLEEP_ON_BAT = "deep";
 
-	START_CHARGE_THRESH_BAT0 = 75;
-	STOP_CHARGE_THRESH_BAT0 = 80;
-      };
+      START_CHARGE_THRESH_BAT0 = 75;
+      STOP_CHARGE_THRESH_BAT0 = 80;
+    };
   };
 
+  services.thermald.enable = false;
   services.throttled = {
     enable = true;
     extraConfig =
@@ -265,10 +247,6 @@ in
 	ANALOGIO: -100
       '';
   };
-
-  virtualisation.libvirtd.enable = true;
-  virtualisation.spiceUSBRedirection.enable = true;
-  programs.virt-manager.enable = true;
 
   # samba
   services.samba-wsdd.enable = true; # make shares visible for windows 10 clients
@@ -318,6 +296,32 @@ in
     };
   };
 
+  services.mpd = {
+    enable = true;
+    user = "pesekcuy";
+    musicDirectory = "/home/pesekcuy/Music";
+    extraConfig = ''
+      # must specify one or more outputs in order to play audio!
+      # (e.g. ALSA, PulseAudio, PipeWire), see next sections
+      audio_output {
+        type "pipewire"
+        name "My PipeWire Output"
+      }
+      audio_output {
+        type "fifo"
+        name "Visualizer feed"
+        path "/tmp/mpd.fifo"
+        format "44100:16:2"
+      }
+    '';
+
+    network.listenAddress = "any"; # if you want to allow non-localhost connections
+    startWhenNeeded = true; # systemd feature: only start MPD service upon connection to its socket
+  };
+  systemd.services.mpd.environment = {
+    # https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/609
+    XDG_RUNTIME_DIR = "/run/user/1000"; # User-id 1000 must matwch above user. MPD will look inside this directory for the PipeWire socket.
+  };
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
@@ -330,18 +334,12 @@ in
   networking.firewall.allowPing = true;
   services.samba.openFirewall = true;
 
-  # Copy the NixOS configuration file and link it from the resulting system
-  # (/run/current-system/configuration.nix). This is useful in case you
-  # accidentally delete configuration.nix.
-  # system.copySystemConfiguration = true;
-
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
-  # on your system were taken. It's perfectly fine and recommended to leave
+  # on your system were taken. It‘s perfectly fine and recommended to leave
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "23.05"; # Did you read the comment?
 
 }
-
