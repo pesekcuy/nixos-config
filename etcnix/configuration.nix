@@ -14,16 +14,18 @@ in
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      <nixos-hardware/lenovo/thinkpad/x1/6th-gen>
     ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-
-  boot.initrd.luks.devices."luks-9e77a57b-87a7-4006-b7db-0f3e4a002f50".device = "/dev/disk/by-uuid/9e77a57b-87a7-4006-b7db-0f3e4a002f50";
-  networking.hostName = "nixos-x1c6"; # Define your hostname.
+  boot.plymouth.enable = true;
+  boot.initrd.luks.devices."luks-a4b1b397-f554-43e1-a337-4474c551035b".device = "/dev/disk/by-uuid/a4b1b397-f554-43e1-a337-4474c551035b";
+  networking.hostName = "panasdingin"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  boot.kernelPackages = pkgs.linuxPackages_zen;
+  boot.kernelParams = [ "i915.enable_psr=0" "i915.enable_fbc=0" "quiet" "splash" ];
+  fileSystems."/".options = [ "discard" "noatime" "nodiratime" ];
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -31,6 +33,9 @@ in
 
   # Enable networking
   networking.networkmanager.enable = true;
+
+  hardware.bluetooth.enable = true; # enables support for Bluetooth
+  hardware.bluetooth.powerOnBoot = true; # powers up the default Bluetooth controller on boot
 
   # Set your time zone.
   time.timeZone = "Asia/Jakarta";
@@ -50,18 +55,67 @@ in
     LC_TIME = "id_ID.UTF-8";
   };
 
+  # Enable the X11 windowing system.
+  services.xserver.enable = true;
+
+  # Enable the KDE Plasma Desktop Environment.
+  services.xserver.displayManager.sddm.enable = true;
+  services.xserver.desktopManager.plasma5.enable = true;
+  services.xserver.displayManager.defaultSession = "plasmawayland";
+
+  environment.plasma5.excludePackages = with pkgs.libsForQt5; [
+    elisa
+    oxygen
+    khelpcenter
+    plasma-browser-integration
+    print-manager
+  ];
+
   # Configure keymap in X11
   services.xserver = {
-    layout = "us";
+    layout = "jp";
     xkbVariant = "";
   };
+
+  # Configure console keymap
+  console.keyMap = "jp106";
+
+  # Enable CUPS to print documents.
+  services.printing.enable = true;
+  services.printing.drivers = [ pkgs.hplipWithPlugin ];
+  hardware.sane.enable = true;
+  hardware.sane.extraBackends = [ pkgs.hplipWithPlugin ];
+
+  # Enable sound with pipewire.
+  sound.enable = true;
+  hardware.pulseaudio.enable = false;
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    # If you want to use JACK applications, uncomment this
+    #jack.enable = true;
+
+    # use the example session manager (no others are packaged yet so this is enabled by default,
+    # no need to redefine it in your config for now)
+    #media-session.enable = true;
+  };
+
+  # Enable touchpad support (enabled default in most desktopManager).
+  services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.pesekcuy = {
     isNormalUser = true;
     description = "Adi Nugroho";
-    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" ];
-    packages = with pkgs; [];
+    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" "adbusers" ];
+    packages = with pkgs; [
+      firefox
+      kate
+    #  thunderbird
+    ];
   };
 
   # Allow unfree packages
@@ -72,48 +126,14 @@ in
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
-    polkit_gnome
+    usbutils
+    pciutils
+    wineWowPackages.waylandFull
+    winetricks
     (python3.withPackages my-python-packages)
   ];
 
-  qt = {
-    enable = true;
-    platformTheme = "gtk2";
-    style = "adwaita-dark";
-  };
-
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
-  environment.variables.XCURSOR_SIZE = "32";
-
-  fonts.packages = with pkgs; [
-    lato
-    noto-fonts
-    noto-fonts-cjk
-    noto-fonts-emoji
-    liberation_ttf
-    font-awesome
-    (nerdfonts.override { fonts = [ "SpaceMono" ]; })
-  ];
-
-  fonts.fontconfig = {
-    defaultFonts = {
-      serif = [ "Noto Serif" ];
-      sansSerif = [ "Lato" ];
-      monospace = [ "SpaceMono Nerd Font" ];
-    };
-    antialias = true;
-    hinting.enable = true;
-    hinting.style = "slight";
-    subpixel.rgba = "rgb";
-  };
-
-  hardware.opengl = {
-    enable = true;
-    driSupport = true;
-    driSupport32Bit = true;
-    extraPackages = with pkgs; [ intel-media-driver ];
-  };
-  powerManagement.powertop.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -123,50 +143,97 @@ in
   #   enableSSHSupport = true;
   # };
 
+  programs.adb.enable = true;
+
   programs.dconf.enable = true;
-
-  programs.hyprland.enable = true;
-  xdg.portal = {
-    enable = true;
-    # gtk portal needed to make gtk apps happy
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-  };
-
-  security.pam.services.swaylock = {};
-  security.polkit.enable = true;
-
-  programs.thunar.enable = true;
-  programs.thunar.plugins = with pkgs.xfce; [
-    thunar-archive-plugin
-    thunar-media-tags-plugin
-    thunar-volman
-  ];
 
   virtualisation.libvirtd.enable = true;
   virtualisation.spiceUSBRedirection.enable = true;
   programs.virt-manager.enable = true;
 
   # List services that you want to enable:
+  services.flatpak.enable = true;
+  services.gvfs.enable = true;
 
-  services.printing.enable = true;
-  services.printing.drivers = [ pkgs.hplipWithPlugin ];
-  hardware.sane.enable = true;
-  hardware.sane.extraBackends = [ pkgs.hplipWithPlugin ];
+  # Enable the OpenSSH daemon.
+  # services.openssh.enable = true;
 
-  services.gvfs = {
+  # Samba
+  services.samba-wsdd.enable = true; # make shares visible for windows 10 clients
+  networking.firewall.allowedTCPPorts = [
+    5357 # wsdd
+  ];
+  networking.firewall.allowedUDPPorts = [
+    3702 # wsdd
+  ];
+  services.samba = {
     enable = true;
-    package = lib.mkForce pkgs.gnome3.gvfs;
+    securityType = "user";
+    extraConfig = ''
+      workgroup = WORKGROUP
+      server string = smbnix
+      netbios name = smbnix
+      security = user 
+      #use sendfile = yes
+      #max protocol = smb2
+      # note: localhost is the ipv6 localhost ::1
+      hosts allow = 192.168.0. 192.168.1. 192.168.122. 127.0.0.1 localhost
+      hosts deny = 0.0.0.0/0
+      guest account = nobody
+      map to guest = bad user
+    '';
+    shares = {
+      panasdingin = {
+        path = "/home/pesekcuy/";
+        browseable = "yes";
+        "read only" = "no";
+        "guest ok" = "no";
+        "create mask" = "0644";
+        "directory mask" = "0755";
+        "force user" = "pesekcuy";
+        "force group" = "users";
+      };
+    };
   };
 
-  services.tumbler.enable = true;
+  # Open ports in the firewall.
+  # networking.firewall.allowedTCPPorts = [ ... ];
+  # networking.firewall.allowedUDPPorts = [ ... ];
+  # Or disable the firewall altogether.
+  networking.firewall.enable = true;
+  networking.firewall.allowPing = true;
+  services.samba.openFirewall = true;
 
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    pulse.enable = true;
+  # Fonts
+  fonts.packages = with pkgs; [
+    roboto
+    noto-fonts
+    noto-fonts-cjk
+    noto-fonts-emoji
+    liberation_ttf
+    font-awesome
+    (nerdfonts.override { fonts = [ "CodeNewRoman" ]; })
+  ];
+  fonts.fontconfig.defaultFonts = {
+    serif = [ "Noto Serif" ];
+    sansSerif = [ "Roboto" ];
+    monospace = [ "CodeNewRoman Nerd Font Mono" ];
   };
 
-  services.hardware.bolt.enable = true;
+  # Integrated GPU
+  nixpkgs.config.packageOverrides = pkgs: {
+    vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
+  };
+  hardware.opengl = {
+    enable = true;
+    driSupport = true;
+    driSupport32Bit = true;
+    extraPackages = with pkgs; [ vaapiIntel ];
+    extraPackages32 = with pkgs.pkgsi686Linux; [ vaapiIntel ];
+  };
+
+  # Power management
+  powerManagement.powertop.enable = true;
   services.power-profiles-daemon.enable = false;
   services.tlp = {
     enable = true;
@@ -196,12 +263,8 @@ in
 
       MEM_SLEEP_ON_AC = "deep";
       MEM_SLEEP_ON_BAT = "deep";
-
-      START_CHARGE_THRESH_BAT0 = 75;
-      STOP_CHARGE_THRESH_BAT0 = 80;
     };
   };
-
   services.thermald.enable = false;
   services.throttled = {
     enable = true;
@@ -233,69 +296,22 @@ in
 	Disable_BDPROCHOT: False
 
 	[UNDERVOLT.BATTERY]
-	CORE: -100
-	GPU: -100
-	CACHE: -100
-	UNCORE: -100
-	ANALOGIO: -100
+	CORE: -70
+	GPU: -70
+	CACHE: -70
+	UNCORE: -70
+	ANALOGIO: -70
 
 	[UNDERVOLT.AC]
-	CORE: -100
-	GPU: -100
-	CACHE: -100
-	UNCORE: -100
-	ANALOGIO: -100
+	CORE: -70
+	GPU: -70
+	CACHE: -70
+	UNCORE: -70
+	ANALOGIO: -70
       '';
   };
 
-  # samba
-  services.samba-wsdd.enable = true; # make shares visible for windows 10 clients
-  networking.firewall.allowedTCPPorts = [
-    5357 # wsdd
-  ];
-  networking.firewall.allowedUDPPorts = [
-    3702 # wsdd
-  ];
-  services.samba = {
-    enable = true;
-    securityType = "user";
-    extraConfig = ''
-      workgroup = WORKGROUP
-      server string = smbnix
-      netbios name = smbnix
-      security = user 
-      #use sendfile = yes
-      #max protocol = smb2
-      # note: localhost is the ipv6 localhost ::1
-      hosts allow = 192.168.0. 192.168.1. 192.168.122. 127.0.0.1 localhost
-      hosts deny = 0.0.0.0/0
-      guest account = nobody
-      map to guest = bad user
-    '';
-    shares = {
-      public = {
-        path = "/home/pesekcuy/Public";
-        browseable = "yes";
-        "read only" = "no";
-        "guest ok" = "yes";
-        "create mask" = "0644";
-        "directory mask" = "0755";
-        "force user" = "pesekcuy";
-        "force group" = "users";
-      };
-      private = {
-        path = "/home/pesekcuy/";
-        browseable = "yes";
-        "read only" = "no";
-        "guest ok" = "no";
-        "create mask" = "0644";
-        "directory mask" = "0755";
-        "force user" = "pesekcuy";
-        "force group" = "users";
-      };
-    };
-  };
-
+  # MPD
   services.mpd = {
     enable = true;
     user = "pesekcuy";
@@ -323,23 +339,12 @@ in
     XDG_RUNTIME_DIR = "/run/user/1000"; # User-id 1000 must matwch above user. MPD will look inside this directory for the PipeWire socket.
   };
 
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  networking.firewall.enable = true;
-  networking.firewall.allowPing = true;
-  services.samba.openFirewall = true;
-
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It‘s perfectly fine and recommended to leave
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "23.05"; # Did you read the comment?
+  system.stateVersion = "23.11"; # Did you read the comment?
 
 }

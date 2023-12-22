@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
   # Home Manager needs a bit of information about you and the paths it should
@@ -15,6 +15,8 @@
   # release notes.
   home.stateVersion = "23.11"; # Please read the comment before changing.
 
+  nixpkgs.config.allowUnfree = true;
+
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
@@ -22,29 +24,20 @@
     # # "Hello, world!" when run.
     # pkgs.hello
 
-    foot
-    wofi
-    hyprpaper
-    swayidle
-    swaylock
-    dunst
-    waybar
-    xdg-user-dirs
-    wl-mirror
-    pulseaudio
-    brightnessctl
-    pavucontrol
-    grim
-    slurp
-    imv
-
+    ffmpeg
     firefox
     gimp
     git
+    inkscape
     kicad
     libreoffice-fresh
+    libsForQt5.kamoso
+    mkvtoolnix
     mpv
+    nmap
     qbittorrent
+    yewtube
+    yt-dlp
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
@@ -62,7 +55,6 @@
 
   programs.vscode = {
     enable = true;
-    package = pkgs.vscodium;
     extensions = with pkgs.vscode-extensions; [ ms-python.python ];
   };
 
@@ -80,6 +72,18 @@
       visualizer_type = "spectrum";
       visualizer_look = "+|";
     };
+  };
+
+  home.sessionVariables = {
+    # EDITOR = "emacs";
+    GTK_USE_PORTAL = "1";
+  };
+
+  home.pointerCursor = {
+    x11.enable = true;
+    name = "Breeze";
+    package = pkgs.libsForQt5.breeze-icons;
+    size = 24;
   };
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -110,34 +114,7 @@
   #
   home.sessionVariables = {
     # EDITOR = "emacs";
-    GTK_USE_PORTAL = "1";
   };
-
-  home.pointerCursor = {
-    x11.enable = true;
-    name = "Adwaita";
-    package = pkgs.gnome.adwaita-icon-theme;
-    size = 24;
-  };
-
-  gtk = {
-    enable = true;
-    font = {
-      package = pkgs.lato;
-      name = "Lato";
-      size = 12;
-    };
-    iconTheme = {
-      package = pkgs.papirus-icon-theme;
-      name = "Papirus-Dark";
-    };
-    theme = {
-      package = pkgs.gnome-themes-extra;
-      name = "Adwaita-dark";
-    };
-  };
-
-  nixpkgs.config.allowUnfree = true;
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
