@@ -20,7 +20,7 @@ in
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.plymouth.enable = true;
-  boot.initrd.luks.devices."luks-a4b1b397-f554-43e1-a337-4474c551035b".device = "/dev/disk/by-uuid/a4b1b397-f554-43e1-a337-4474c551035b";
+  boot.initrd.luks.devices."luks-e3e23fbd-d63e-4e76-9c94-91d3b071f6d7".device = "/dev/disk/by-uuid/e3e23fbd-d63e-4e76-9c94-91d3b071f6d7";
   networking.hostName = "panasdingin"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   boot.kernelPackages = pkgs.linuxPackages_zen;
@@ -57,6 +57,7 @@ in
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
+  services.xserver.excludePackages = [ pkgs.xterm ];
 
   # Enable the KDE Plasma Desktop Environment.
   services.xserver.displayManager.sddm.enable = true;
@@ -104,7 +105,7 @@ in
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
-  services.xserver.libinput.enable = true;
+  # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.pesekcuy = {
@@ -143,17 +144,14 @@ in
   #   enableSSHSupport = true;
   # };
 
-  programs.adb.enable = true;
+  # List services that you want to enable:
 
+  programs.adb.enable = true;
   programs.dconf.enable = true;
+  programs.virt-manager.enable = true;
 
   virtualisation.libvirtd.enable = true;
   virtualisation.spiceUSBRedirection.enable = true;
-  programs.virt-manager.enable = true;
-
-  # List services that you want to enable:
-  services.flatpak.enable = true;
-  services.gvfs.enable = true;
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
@@ -173,7 +171,7 @@ in
       workgroup = WORKGROUP
       server string = smbnix
       netbios name = smbnix
-      security = user 
+      security = user
       #use sendfile = yes
       #max protocol = smb2
       # note: localhost is the ipv6 localhost ::1
@@ -211,7 +209,6 @@ in
     noto-fonts-cjk
     noto-fonts-emoji
     liberation_ttf
-    font-awesome
     (nerdfonts.override { fonts = [ "CodeNewRoman" ]; })
   ];
   fonts.fontconfig.defaultFonts = {
@@ -221,15 +218,12 @@ in
   };
 
   # Integrated GPU
-  nixpkgs.config.packageOverrides = pkgs: {
-    vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
-  };
   hardware.opengl = {
     enable = true;
     driSupport = true;
     driSupport32Bit = true;
-    extraPackages = with pkgs; [ vaapiIntel ];
-    extraPackages32 = with pkgs.pkgsi686Linux; [ vaapiIntel ];
+    extraPackages = with pkgs; [ intel-media-driver ];
+    extraPackages32 = with pkgs.driversi686Linux; [ intel-media-driver ];
   };
 
   # Power management
@@ -252,11 +246,11 @@ in
       CPU_MIN_PERF_ON_BAT = 0;
       CPU_MAX_PERF_ON_BAT = 100;
 
-      CPU_BOOST_ON_AC = 1;
-      CPU_BOOST_ON_BAT = 1;
+      CPU_BOOST_ON_AC = 0;
+      CPU_BOOST_ON_BAT = 0;
 
-      CPU_HWP_DYN_BOOST_ON_AC = 1;
-      CPU_HWP_DYN_BOOST_ON_BAT = 1;
+      CPU_HWP_DYN_BOOST_ON_AC = 0;
+      CPU_HWP_DYN_BOOST_ON_BAT = 0;
 
       PLATFORM_PROFILE_ON_AC = "balanced";
       PLATFORM_PROFILE_ON_BAT = "balanced";
@@ -270,44 +264,44 @@ in
     enable = true;
     extraConfig =
       ''
-	[GENERAL]
-	Enabled: True
-	Sysfs_Power_Path: /sys/class/power_supply/AC/online
-	Autoreload: True
+        [GENERAL]
+        Enabled: True
+        Sysfs_Power_Path: /sys/class/power_supply/AC/online
+        Autoreload: True
 
-	[BATTERY]
-	Update_Rate_s: 30
-	PL1_Tdp_W: 15
-	PL1_Duration_s: 28
-	PL2_Tdp_W: 20
-	PL2_Duration_S: 0.002
-	Trip_Temp_C: 80
-	cTDP: 0
-	Disable_BDPROCHOT: False
+        [BATTERY]
+        Update_Rate_s: 30
+        PL1_Tdp_W: 15
+        PL1_Duration_s: 28
+        PL2_Tdp_W: 20
+        PL2_Duration_S: 0.002
+        Trip_Temp_C: 99
+        cTDP: 0
+        Disable_BDPROCHOT: False
 
-	[AC]
-	Update_Rate_s: 5
-	PL1_Tdp_W: 15
-	PL1_Duration_s: 28
-	PL2_Tdp_W: 20
-	PL2_Duration_S: 0.002
-	Trip_Temp_C: 80
-	cTDP: 0
-	Disable_BDPROCHOT: False
+        [AC]
+        Update_Rate_s: 5
+        PL1_Tdp_W: 15
+        PL1_Duration_s: 28
+        PL2_Tdp_W: 20
+        PL2_Duration_S: 0.002
+        Trip_Temp_C: 99
+        cTDP: 0
+        Disable_BDPROCHOT: False
 
-	[UNDERVOLT.BATTERY]
-	CORE: -70
-	GPU: -70
-	CACHE: -70
-	UNCORE: -70
-	ANALOGIO: -70
+        [UNDERVOLT.BATTERY]
+        CORE: -90
+        GPU: -90
+        CACHE: -90
+        UNCORE: -90
+        ANALOGIO: -90
 
-	[UNDERVOLT.AC]
-	CORE: -70
-	GPU: -70
-	CACHE: -70
-	UNCORE: -70
-	ANALOGIO: -70
+        [UNDERVOLT.AC]
+        CORE: -90
+        GPU: -90
+        CACHE: -90
+        UNCORE: -90
+        ANALOGIO: -90
       '';
   };
 

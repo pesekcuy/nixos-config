@@ -23,20 +23,18 @@
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
-
     ffmpeg
-    firefox
     gimp
     git
     inkscape
     kicad
     libreoffice-fresh
     libsForQt5.kamoso
+    libsForQt5.kcalc
+    libsForQt5.skanlite
     mkvtoolnix
     mpv
-    nmap
     qbittorrent
-    yewtube
     yt-dlp
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
@@ -55,6 +53,7 @@
 
   programs.vscode = {
     enable = true;
+    package = pkgs.vscodium;
     extensions = with pkgs.vscode-extensions; [ ms-python.python ];
   };
 
@@ -65,7 +64,7 @@
       mpd_host = "localhost";
       mpd_port = "6600";
       mpd_music_dir = "/home/pesekcuy/Music";
-      
+
       visualizer_data_source = "/tmp/mpd.fifo";
       visualizer_output_name = "Visualizer feed";
       visualizer_in_stereo = "yes";
@@ -74,14 +73,9 @@
     };
   };
 
-  home.sessionVariables = {
-    # EDITOR = "emacs";
-    GTK_USE_PORTAL = "1";
-  };
-
   home.pointerCursor = {
     x11.enable = true;
-    name = "Breeze";
+    name = "breeze_cursors";
     package = pkgs.libsForQt5.breeze-icons;
     size = 24;
   };
@@ -110,10 +104,15 @@
   #
   # or
   #
+  #  ~/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh
+  #
+  # or
+  #
   #  /etc/profiles/per-user/pesekcuy/etc/profile.d/hm-session-vars.sh
   #
   home.sessionVariables = {
     # EDITOR = "emacs";
+    GTK_USE_PORTAL = "1";
   };
 
   # Let Home Manager install and manage itself.
