@@ -20,7 +20,7 @@ in
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.plymouth.enable = true;
-  boot.initrd.luks.devices."luks-e3e23fbd-d63e-4e76-9c94-91d3b071f6d7".device = "/dev/disk/by-uuid/e3e23fbd-d63e-4e76-9c94-91d3b071f6d7";
+  boot.initrd.luks.devices."luks-335a850a-2034-4a28-a4a1-01fe7ae15c2b".device = "/dev/disk/by-uuid/335a850a-2034-4a28-a4a1-01fe7ae15c2b";
   networking.hostName = "panasdingin"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   boot.kernelPackages = pkgs.linuxPackages_zen;
@@ -111,12 +111,25 @@ in
   users.users.pesekcuy = {
     isNormalUser = true;
     description = "Adi Nugroho";
-    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" "adbusers" ];
+    extraGroups = [ "networkmanager" "wheel" "scanner" "lp" "adbusers" "libvirtd" ];
     packages = with pkgs; [
-      firefox
+      firefox-esr
       kate
     #  thunderbird
     ];
+  };
+
+  virtualisation = {
+    libvirtd = {
+      enable = true;
+      qemu = {
+        package = pkgs.qemu_kvm;
+        swtpm.enable = true;
+        ovmf.enable = true;
+        ovmf.packages = [ pkgs.OVMFFull.fd ];
+      };
+    };
+    spiceUSBRedirection.enable = true;
   };
 
   # Allow unfree packages
@@ -127,6 +140,14 @@ in
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
+    spice
+    spice-gtk
+    spice-protocol
+    virt-manager
+    virt-viewer
+    virtio-win
+    win-spice
+
     usbutils
     pciutils
     wineWowPackages.waylandFull
@@ -148,10 +169,6 @@ in
 
   programs.adb.enable = true;
   programs.dconf.enable = true;
-  programs.virt-manager.enable = true;
-
-  virtualisation.libvirtd.enable = true;
-  virtualisation.spiceUSBRedirection.enable = true;
 
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
@@ -232,14 +249,36 @@ in
   services.tlp = {
     enable = true;
     settings = {
+      SOUND_POWER_SAVE_ON_AC = 10;
+      SOUND_POWER_SAVE_ON_BAT = 10;
+
+      START_CHARGE_THRESH_BAT1 = 0;
+      STOP_CHARGE_THRESH_BAT1 = 80;
+
+      DISK_DEVICES = "ata-SAMSUNG_MZNLN256HMHQ-000H1_S2Y2NX0HB28092";
+      DISK_APM_LEVEL_ON_AC = "128 128";
+      DISK_APM_LEVEL_ON_BAT = "128 128";
+      AHCI_RUNTIME_PM_ON_AC = "auto";
+      AHCI_RUNTIME_PM_ON_BAT = "auto";
+
+      INTEL_GPU_MIN_FREQ_ON_AC = 300;
+      INTEL_GPU_MIN_FREQ_ON_BAT = 300;
+      INTEL_GPU_MAX_FREQ_ON_AC = 1100;
+      INTEL_GPU_MAX_FREQ_ON_BAT = 1100;
+      INTEL_GPU_BOOST_FREQ_ON_AC = 1100;
+      INTEL_GPU_BOOST_FREQ_ON_BAT = 1100;
+
+      WIFI_PWR_ON_AC = "off";
+      WIFI_PWR_ON_BAT = "off";
+
       CPU_SCALING_GOVERNOR_ON_AC = "powersave";
       CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
 
       CPU_DRIVER_OPMODE_ON_AC = "active";
       CPU_DRIVER_OPMODE_ON_BAT = "active";
 
-      CPU_ENERGY_PERF_POLICY_ON_BAT = "balance_power";
-      CPU_ENERGY_PERF_POLICY_ON_AC = "balance_power";
+      CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
+      CPU_ENERGY_PERF_POLICY_ON_AC = "power";
 
       CPU_MIN_PERF_ON_AC = 0;
       CPU_MAX_PERF_ON_AC = 100;
@@ -252,57 +291,19 @@ in
       CPU_HWP_DYN_BOOST_ON_AC = 0;
       CPU_HWP_DYN_BOOST_ON_BAT = 0;
 
-      PLATFORM_PROFILE_ON_AC = "balanced";
-      PLATFORM_PROFILE_ON_BAT = "balanced";
-
       MEM_SLEEP_ON_AC = "deep";
       MEM_SLEEP_ON_BAT = "deep";
+
+      DEVICES_TO_DISABLE_ON_LAN_CONNECT = "wifi wwan";
+      DEVICES_TO_DISABLE_ON_WIFI_CONNECT = "wwan";
+      DEVICES_TO_DISABLE_ON_WWAN_CONNECT = "wifi";
+
+      RUNTIME_PM_ON_AC = "auto";
+      RUNTIME_PM_ON_BAT = "auto";
+
+      PCIE_ASPM_ON_AC = "powersupersave";
+      PCIE_ASPM_ON_BAT = "powersupersave";
     };
-  };
-  services.thermald.enable = false;
-  services.throttled = {
-    enable = true;
-    extraConfig =
-      ''
-        [GENERAL]
-        Enabled: True
-        Sysfs_Power_Path: /sys/class/power_supply/AC/online
-        Autoreload: True
-
-        [BATTERY]
-        Update_Rate_s: 30
-        PL1_Tdp_W: 15
-        PL1_Duration_s: 28
-        PL2_Tdp_W: 20
-        PL2_Duration_S: 0.002
-        Trip_Temp_C: 99
-        cTDP: 0
-        Disable_BDPROCHOT: False
-
-        [AC]
-        Update_Rate_s: 5
-        PL1_Tdp_W: 15
-        PL1_Duration_s: 28
-        PL2_Tdp_W: 20
-        PL2_Duration_S: 0.002
-        Trip_Temp_C: 99
-        cTDP: 0
-        Disable_BDPROCHOT: False
-
-        [UNDERVOLT.BATTERY]
-        CORE: -90
-        GPU: -90
-        CACHE: -90
-        UNCORE: -90
-        ANALOGIO: -90
-
-        [UNDERVOLT.AC]
-        CORE: -90
-        GPU: -90
-        CACHE: -90
-        UNCORE: -90
-        ANALOGIO: -90
-      '';
   };
 
   # MPD

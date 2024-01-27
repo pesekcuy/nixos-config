@@ -23,11 +23,12 @@
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
+    emacs
     ffmpeg
     gimp
     git
     inkscape
-    kicad
+    kicad-small
     libreoffice-fresh
     libsForQt5.kamoso
     libsForQt5.kcalc
@@ -35,6 +36,7 @@
     mkvtoolnix
     mpv
     qbittorrent
+    smlnj
     yt-dlp
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
@@ -113,6 +115,13 @@
   home.sessionVariables = {
     # EDITOR = "emacs";
     GTK_USE_PORTAL = "1";
+  };
+
+  dconf.settings = {
+    "org/virt-manager/virt-manager/connections" = {
+      autoconnect = [ "qemu:///system" ];
+      uris = [ "qemu:///system" ];
+    };
   };
 
   # Let Home Manager install and manage itself.
