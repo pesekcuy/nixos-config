@@ -23,20 +23,16 @@
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
-    emacs
     ffmpeg
     gimp
     git
+    haruna
     inkscape
-    kicad-small
     libreoffice-fresh
     libsForQt5.kamoso
     libsForQt5.kcalc
     libsForQt5.skanlite
-    mkvtoolnix
-    mpv
     qbittorrent
-    smlnj
     yt-dlp
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
