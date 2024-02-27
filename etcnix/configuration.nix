@@ -61,9 +61,14 @@ in
   services.xserver.excludePackages = [ pkgs.xterm ];
 
   # Enable the KDE Plasma Desktop Environment.
-  services.xserver.displayManager.sddm.enable = true;
+  services.xserver.displayManager = {
+    sddm = {
+      enable = true;
+      wayland.enable = true;
+    };
+    defaultSession = "plasmawayland";
+  };
   services.xserver.desktopManager.plasma5.enable = true;
-  services.xserver.displayManager.defaultSession = "plasmawayland";
 
   environment.plasma5.excludePackages = with pkgs.libsForQt5; [
     elisa
@@ -149,6 +154,7 @@ in
     virtio-win
     win-spice
 
+    
     usbutils
     pciutils
     wineWowPackages.waylandFull

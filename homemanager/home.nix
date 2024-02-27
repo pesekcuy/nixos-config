@@ -23,7 +23,7 @@
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
-    ffmpeg
+    ffmpeg-full
     gimp
     git
     haruna
@@ -33,6 +33,7 @@
     libsForQt5.kcalc
     libsForQt5.skanlite
     qbittorrent
+    tageditor
     yt-dlp
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
