@@ -66,11 +66,11 @@ in
       enable = true;
       wayland.enable = true;
     };
-    defaultSession = "plasmawayland";
+    defaultSession = "plasma";
   };
-  services.xserver.desktopManager.plasma5.enable = true;
+  services.xserver.desktopManager.plasma6.enable = true;
 
-  environment.plasma5.excludePackages = with pkgs.libsForQt5; [
+  environment.plasma6.excludePackages = with pkgs.kdePackages; [
     elisa
     oxygen
     khelpcenter
@@ -154,7 +154,6 @@ in
     virtio-win
     win-spice
 
-    
     usbutils
     pciutils
     wineWowPackages.waylandFull

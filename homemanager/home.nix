@@ -26,12 +26,13 @@
     ffmpeg-full
     gimp
     git
-    haruna
     inkscape
+    jdk
+    #kdePackages.kamoso
+    kdePackages.kcalc
+    kdePackages.skanlite
     libreoffice-fresh
-    libsForQt5.kamoso
-    libsForQt5.kcalc
-    libsForQt5.skanlite
+    mpv
     qbittorrent
     tageditor
     yt-dlp
@@ -53,7 +54,10 @@
   programs.vscode = {
     enable = true;
     package = pkgs.vscodium;
-    extensions = with pkgs.vscode-extensions; [ ms-python.python ];
+    extensions = with pkgs.vscode-extensions; [ 
+      ms-python.python
+      redhat.java
+    ];
   };
 
   programs.ncmpcpp = {
