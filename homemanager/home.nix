@@ -79,7 +79,7 @@
   home.pointerCursor = {
     x11.enable = true;
     name = "breeze_cursors";
-    package = pkgs.libsForQt5.breeze-icons;
+    package = pkgs.kdePackages.breeze-icons;
     size = 24;
   };
 
