@@ -27,14 +27,13 @@
     gimp
     git
     inkscape
-    jdk
     #kdePackages.kamoso
     kdePackages.kcalc
     kdePackages.skanlite
+    kid3
     libreoffice-fresh
     mpv
     qbittorrent
-    tageditor
     yt-dlp
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
@@ -62,17 +61,11 @@
 
   programs.ncmpcpp = {
     enable = true;
-    package = pkgs.ncmpcpp.override { visualizerSupport = true; clockSupport = true; };
+    package = pkgs.ncmpcpp;
     settings = {
       mpd_host = "localhost";
       mpd_port = "6600";
       mpd_music_dir = "/home/pesekcuy/Music";
-
-      visualizer_data_source = "/tmp/mpd.fifo";
-      visualizer_output_name = "Visualizer feed";
-      visualizer_in_stereo = "yes";
-      visualizer_type = "spectrum";
-      visualizer_look = "+|";
     };
   };
 

@@ -4,24 +4,16 @@
 
 { config, pkgs, lib, ... }:
 
-let
-  my-python-packages = ps: with ps; [
-    scipy
-    matplotlib
-  ];
-in
 {
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
     ];
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.initrd.luks.devices."luks-9f715702-d643-4b96-97d6-685c9038599d".device = "/dev/disk/by-uuid/9f715702-d643-4b96-97d6-685c9038599d";
+  boot.initrd.luks.devices."luks-...".device = "/dev/disk/by-uuid/...";
   networking.hostName = "panasdingin"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   boot.kernelPackages = pkgs.linuxPackages_zen;
@@ -61,14 +53,14 @@ in
   services.xserver.excludePackages = [ pkgs.xterm ];
 
   # Enable the KDE Plasma Desktop Environment.
-  services.xserver.displayManager = {
+  services.displayManager = {
     sddm = {
       enable = true;
       wayland.enable = true;
     };
     defaultSession = "plasma";
   };
-  services.xserver.desktopManager.plasma6.enable = true;
+  services.desktopManager.plasma6.enable = true;
 
   environment.plasma6.excludePackages = with pkgs.kdePackages; [
     elisa
@@ -89,9 +81,9 @@ in
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
-  services.printing.drivers = [ pkgs.hplipWithPlugin ];
+  services.printing.drivers = [ pkgs.hplip ];
   hardware.sane.enable = true;
-  hardware.sane.extraBackends = [ pkgs.hplipWithPlugin ];
+  hardware.sane.extraBackends = [ pkgs.hplip ];
 
   # Enable sound with pipewire.
   sound.enable = true;
@@ -119,7 +111,7 @@ in
     description = "Adi Nugroho";
     extraGroups = [ "networkmanager" "wheel" "scanner" "lp" "adbusers" "libvirtd" ];
     packages = with pkgs; [
-      firefox-esr
+      firefox
       kate
     #  thunderbird
     ];
@@ -145,7 +137,7 @@ in
   # $ nix search wget
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+    wget
     spice
     spice-gtk
     spice-protocol
@@ -153,12 +145,8 @@ in
     virt-viewer
     virtio-win
     win-spice
-
     usbutils
     pciutils
-    wineWowPackages.waylandFull
-    winetricks
-    (python3.withPackages my-python-packages)
   ];
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
@@ -228,17 +216,17 @@ in
 
   # Fonts
   fonts.packages = with pkgs; [
-    roboto
+    inter
+    iosevka
     noto-fonts
     noto-fonts-cjk
     noto-fonts-emoji
     liberation_ttf
-    (nerdfonts.override { fonts = [ "CodeNewRoman" ]; })
   ];
   fonts.fontconfig.defaultFonts = {
     serif = [ "Noto Serif" ];
-    sansSerif = [ "Roboto" ];
-    monospace = [ "CodeNewRoman Nerd Font Mono" ];
+    sansSerif = [ "Inter" ];
+    monospace = [ "Iosevka" ];
   };
 
   # Integrated GPU
@@ -266,12 +254,6 @@ in
         type "pipewire"
         name "My PipeWire Output"
       }
-      audio_output {
-        type "fifo"
-        name "Visualizer feed"
-        path "/tmp/mpd.fifo"
-        format "44100:16:2"
-      }
     '';
 
     network.listenAddress = "any"; # if you want to allow non-localhost connections
@@ -288,6 +270,6 @@ in
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "23.11"; # Did you read the comment?
+  system.stateVersion = "24.05"; # Did you read the comment?
 
 }
