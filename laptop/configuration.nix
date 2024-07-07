@@ -111,6 +111,14 @@
     extraGroups = [ "networkmanager" "wheel" "scanner" "lp" "adbusers" "libvirtd" ];
     packages = with pkgs; [
       adwaita-icon-theme
+      (chromium.override {
+        commandLineArgs = [
+          "--enable-features=VaapiVideoDecodeLinuxGL"
+          "--ignore-gpu-blocklist"
+          "--enable-zero-copy"
+        ];
+        enableWideVine = true;
+      })
       ffmpeg-full
       firefox
       gimp
