@@ -15,7 +15,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
   networking.hostName = "simbadut"; # Define your hostname.
   boot.kernelPackages = pkgs.linuxPackages_zen;
-  boot.kernelParams = [ "quiet" ];
+  boot.kernelParams = [ "quiet" "usbcore.autosuspend=-1" ];
   fileSystems."/".options = [ "discard" "noatime" "nodiratime" ];
   fileSystems."/mnt/Data".options = [ "relatime" ];
 
@@ -58,10 +58,10 @@
   services.displayManager = {
     sddm = {
       enable = true;
-      wayland.enable = true;
+#      wayland.enable = true;
     };
     autoLogin.user = "pesekcuy";
-    defaultSession = "plasma";
+    defaultSession = "plasmax11";
   };
   services.desktopManager.plasma6.enable = true;
 
@@ -114,38 +114,29 @@
     description = "pesekcuy";
     extraGroups = [ "networkmanager" "wheel" "scanner" "lp" "adbusers" "libvirtd" ];
     packages = with pkgs; [
-      cantata
+      (chromium.override {
+        commandLineArgs = [
+          "--enable-features=VaapiVideoDecodeLinuxGL"
+          "--ignore-gpu-blocklist"
+          "--enable-zero-copy"
+        ];
+        enableWideVine = true;
+      })
       ffmpeg-full
-      firefox
-      gimp
       git
-      gnome.adwaita-icon-theme
-      gnome.gnome-boxes
       inkscape
       kdePackages.kcalc
       kdePackages.skanlite
       kid3
       libreoffice-qt
       mpv
+      ncmpcpp
       opustags
       python3
       qbittorrent
       steam
       yt-dlp
     ];
-  };
-
-  virtualisation = {
-    libvirtd = {
-      enable = true;
-      qemu = {
-        package = pkgs.qemu_kvm;
-        swtpm.enable = true;
-        ovmf.enable = true;
-        ovmf.packages = [ pkgs.OVMFFull.fd ];
-      };
-    };
-    spiceUSBRedirection.enable = true;
   };
 
   # Allow unfree packages
@@ -174,6 +165,7 @@
 
   # List services that you want to enable:
   services.fwupd.enable = true;
+  services.flatpak.enable = true;
 
   programs.adb.enable = true;
   programs.dconf.enable = true;
@@ -227,7 +219,6 @@
 
   # Fonts
   fonts.packages = with pkgs; [
-    noto-fonts
     noto-fonts-cjk
     noto-fonts-emoji
     liberation_ttf

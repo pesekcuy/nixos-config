@@ -38,13 +38,6 @@
     # '')
   ];
 
-  home.pointerCursor = {
-    x11.enable = true;
-    name = "breeze_cursors";
-    package = pkgs.kdePackages.breeze-icons;
-    size = 24;
-  };
-
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
