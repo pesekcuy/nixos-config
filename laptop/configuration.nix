@@ -63,6 +63,7 @@
   services.desktopManager.plasma6.enable = true;
 
   environment.plasma6.excludePackages = with pkgs.kdePackages; [
+    elisa
     oxygen
     khelpcenter
     krdp
@@ -120,7 +121,6 @@
         enableWideVine = true;
       })
       ffmpeg-full
-      firefox
       gimp
       git
       gnome.gnome-boxes
@@ -130,6 +130,7 @@
       kid3
       libreoffice-qt
       mpv
+      ncmpcpp
       opustags
       python3
       qbittorrent
@@ -163,6 +164,7 @@
     pciutils
     unrar
     gptfdisk
+    exfatprogs
   ];
 
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
@@ -253,6 +255,28 @@
   # Power management
   services.thermald.enable = true;
   powerManagement.powertop.enable = true;
+
+  # MPD
+  services.mpd = {
+    enable = true;
+    user = "pesekcuy";
+    musicDirectory = "/home/pesekcuy/Music";
+    extraConfig = ''
+      # must specify one or more outputs in order to play audio!
+      # (e.g. ALSA, PulseAudio, PipeWire), see next sections
+      audio_output {
+        type "pipewire"
+        name "My PipeWire Output"
+      }
+    '';
+
+    network.listenAddress = "any"; # if you want to allow non-localhost connections
+    startWhenNeeded = true; # systemd feature: only start MPD service upon connection to its socket
+  };
+  systemd.services.mpd.environment = {
+    # https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/609
+    XDG_RUNTIME_DIR = "/run/user/1000"; # User-id 1000 must matwch above user. MPD will look inside this directory for the PipeWire socket.
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
